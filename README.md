@@ -1,7 +1,6 @@
 # jonathanhodges.ai
 
-Personal website for Jonathan Hodges — a static, single-page portfolio site.
-Migrated from Gamma to a hand-editable static site hosted on Cloudflare Pages.
+Personal website for Jonathan Hodges — a static, single-page applied-AI executive site hosted on Cloudflare Pages.
 
 ## Structure
 
@@ -25,12 +24,8 @@ python3 -m http.server 8000
 
 ## Deploy
 
-Hosted on **Cloudflare Pages**, connected to this GitHub repo (`hodgesz/personal-website`).
-Every push to `main` triggers a deploy.
-
-- Framework preset: **None**
-- Build command: *(none)*
-- Output directory: **/** (repo root)
+Hosted on the Cloudflare Pages Direct Upload project `personal-website`.
+A Git push does not deploy this project. See `HANDOFF.md` for the current Wrangler deployment command and infrastructure notes.
 
 ## Editing content
 
