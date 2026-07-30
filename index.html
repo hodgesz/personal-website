@@ -18,7 +18,34 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&amp;family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&amp;display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/styles.css?v=20260723-1532" />
+  <link rel="stylesheet" href="/styles.css?v=20260730-1520" />
+
+  <!-- Marks that scripting is live, so styles.css may hide `.reveal` blocks for the
+       scroll animation. Must stay here in <head>, before first paint, or the content
+       flashes in and then disappears. Without JS the class is never added and every
+       `.reveal` block renders normally — the animation is an enhancement, not a
+       prerequisite for reading the page. -->
+  <script>document.documentElement.classList.add('js');</script>
+
+  <!-- Watchdog for the gap the line above leaves open. Adding `js` commits to "hiding is
+       safe" before the code that undoes the hiding exists, so a body script that never runs
+       still blanks the page: a syntax error in it (which its own try/catch cannot catch), a
+       throw anywhere above the reveal block, or a response truncated before the script
+       arrives. All three were measured at 28 of 28 blocks hidden.
+
+       DOMContentLoaded is the right moment to check, not an arbitrary timer: it fires after
+       every parser-blocking script has had its turn, and it fires whether that script threw,
+       failed to parse, or never arrived. If the reveal code armed itself, this does nothing.
+       Otherwise `js` comes back off and the page renders exactly as it does without
+       scripting — visible and unanimated.
+
+       Separate <script> element on purpose. A parse error is scoped to its own element, so
+       this survives one in the block below and in the footer. -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      if (!window.__revealArmed) document.documentElement.classList.remove('js');
+    });
+  </script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -360,11 +387,73 @@
   </footer>
 
   <script>
-    document.getElementById('year').textContent = new Date().getFullYear();
+    // The reveal animation runs FIRST and in its own block. `<html class="js">` has already
+    // hidden every `.reveal`, so any exception before the observer is attached leaves the
+    // page blank. It used to share one IIFE with the nav code below and sat after an
+    // unguarded getElementById, so a null nav button or a renamed footer span took the
+    // page's content down with it.
+    //
+    // Ordering helps only against a *runtime* throw. A SyntaxError is scoped to the whole
+    // <script> ELEMENT, so a typo in the nav IIFE at the bottom still stops this block from
+    // ever running — measured at 87% of the page hidden. That is what the <head> watchdog is
+    // for; do not treat the split into three IIFEs as isolation on its own.
+    //
+    // The observer is attached once, to a static NodeList. Any `.reveal` element added to the
+    // DOM after this point is never observed and stays at opacity 0 forever (verified). No
+    // code on this page inserts one today. If that changes, either call `showAll()` on the new
+    // element or drop the `reveal` class from it — do not assume the observer will find it.
+    (function () {
+      // Re-query inside showAll rather than closing over a variable: if the throw happens
+      // before `items` is assigned, a closure over it would throw again inside the handler
+      // and re-blank the page. The whole body is inside the try for the same reason.
+      function showAll() {
+        var all = document.querySelectorAll('.reveal');
+        for (var i = 0; i < all.length; i++) all[i].classList.add('is-visible');
+      }
+
+      try {
+        var items = document.querySelectorAll('.reveal');
+
+        if (!('IntersectionObserver' in window) ||
+            (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)) {
+          showAll();
+          window.__revealArmed = true;
+          return;
+        }
+
+        var observer = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-visible');
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.08, rootMargin: '0px 0px -5% 0px' });
+
+        for (var j = 0; j < items.length; j++) observer.observe(items[j]);
+
+        // Set only once the observer is actually watching every block. This is what tells the
+        // <head> watchdog to stand down; anything that stops execution before this line leaves
+        // it unset, and the watchdog removes `js` so nothing stays hidden.
+        window.__revealArmed = true;
+      } catch (err) {
+        // Reveal is decoration; readable content is not optional. Fail visible.
+        showAll();
+        window.__revealArmed = true;
+      }
+    })();
+
+    // Progressive enhancements below. Each is independent and guarded, so one missing
+    // element cannot break another — and none of them can hide content.
+    (function () {
+      var year = document.getElementById('year');
+      if (year) year.textContent = new Date().getFullYear();
+    })();
 
     (function () {
       var toggle = document.querySelector('.nav-toggle');
       var nav = document.getElementById('primary-nav');
+      if (!toggle || !nav) return;
 
       toggle.addEventListener('click', function () {
         var open = toggle.getAttribute('aria-expanded') === 'true';
@@ -378,23 +467,6 @@
           nav.classList.remove('is-open');
         }
       });
-
-      var items = document.querySelectorAll('.reveal');
-      if (!('IntersectionObserver' in window) || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        items.forEach(function (item) { item.classList.add('is-visible'); });
-        return;
-      }
-
-      var observer = new IntersectionObserver(function (entries) {
-        entries.forEach(function (entry) {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('is-visible');
-            observer.unobserve(entry.target);
-          }
-        });
-      }, { threshold: 0.08, rootMargin: '0px 0px -5% 0px' });
-
-      items.forEach(function (item) { observer.observe(item); });
     })();
   </script>
 </body>

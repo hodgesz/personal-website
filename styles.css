@@ -942,26 +942,31 @@ h1, h2, h3 {
   outline-offset: 4px;
 }
 
-.reveal {
+/* Scroll-reveal animation. Every rule that HIDES content is scoped to `.js`, which the
+   inline script in <head> adds to <html>. If scripting is blocked, or that script never
+   runs, the class is absent and the content simply renders — visible and unanimated.
+   Do not hide `.reveal` unconditionally: `is-visible` is only ever added by JS, so an
+   unscoped `opacity: 0` makes 87% of the page's text invisible without it. */
+.js .reveal {
   opacity: 0;
   transform: translateY(20px);
   transition: opacity 0.6s var(--ease), transform 0.6s var(--ease);
 }
 
-.reveal.is-visible {
+.js .reveal.is-visible {
   opacity: 1;
   transform: none;
 }
 
-.approach-item:nth-child(2),
-.capability:nth-child(2),
-.project:nth-child(2) { transition-delay: 0.06s; }
+.js .approach-item:nth-child(2),
+.js .capability:nth-child(2),
+.js .project:nth-child(2) { transition-delay: 0.06s; }
 
-.approach-item:nth-child(3),
-.capability:nth-child(3),
-.project:nth-child(3) { transition-delay: 0.12s; }
+.js .approach-item:nth-child(3),
+.js .capability:nth-child(3),
+.js .project:nth-child(3) { transition-delay: 0.12s; }
 
-.approach-item:nth-child(4) { transition-delay: 0.18s; }
+.js .approach-item:nth-child(4) { transition-delay: 0.18s; }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
@@ -970,7 +975,26 @@ h1, h2, h3 {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
-  .reveal { opacity: 1; transform: none; }
+  .js .reveal { opacity: 1; transform: none; }
+}
+
+/* Print is the same bug on another medium: `is-visible` is added by an IntersectionObserver,
+   which only ever fires for blocks the reader happened to scroll past. Someone who loads the
+   page and hits Cmd-P prints 894 characters over 8 pages instead of 6,562 — seven near-blank
+   sheets. Nothing about print should depend on scroll position, so unhide unconditionally.
+   `!important` because the reduced-motion block above is equally specific and later rules do
+   not lose to earlier ones only by being in a media query.
+
+   `transition: none` is load-bearing, not tidiness: without it the opacity animates 0 → 1
+   over 0.6s when the print stylesheet applies, and a rasterizer that snapshots before it
+   settles prints the page part-faded. Measured mid-transition: 28 blocks below 0.99 at t=0,
+   still 28 at t=300ms. Print has nothing to animate for, so make it instant. */
+@media print {
+  .js .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
 }
 
 @media (max-width: 1000px) {
