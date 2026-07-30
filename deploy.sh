@@ -39,6 +39,36 @@ if ! git rev-parse --verify --quiet "$ref" >/dev/null; then
 	exit 1
 fi
 
+# A remote-tracking ref only moves on fetch, so `origin/main` is whatever this clone last heard about --
+# which for the default invocation is the difference between publishing what is on main and publishing a
+# stale copy of it while reporting success. This clone sat three commits behind for days, so that is not
+# hypothetical. Comparing against the remote is one network call, and the answer is worth it.
+case "$ref" in
+origin/*)
+	remote_branch="${ref#origin/}"
+	if remote_sha="$(git ls-remote origin "refs/heads/$remote_branch" 2>/dev/null | cut -f1)" &&
+		[ -n "$remote_sha" ]; then
+		local_sha="$(git rev-parse "$ref")"
+		if [ "$remote_sha" != "$local_sha" ]; then
+			echo "deploy: $ref is ${local_sha:0:12} here but ${remote_sha:0:12} on the remote." >&2
+			echo "deploy: deploying it would publish a stale site and report success. Run: git fetch origin" >&2
+			echo "deploy: or pass an explicit commit if you truly mean the older one." >&2
+			exit 1
+		fi
+	else
+		# No network, or the branch is gone. Refusing would make the script unusable offline for a
+		# preview, so say what could not be checked and let a preview through -- but never production,
+		# where the cost of being wrong is the recruiter-facing site.
+		echo "deploy: could not reach the remote to confirm $ref is current." >&2
+		if [ "$branch" = "main" ]; then
+			echo "deploy: refusing a production deploy on an unverified ref." >&2
+			exit 1
+		fi
+		echo "deploy: continuing anyway -- this is a preview, not production." >&2
+	fi
+	;;
+esac
+
 staging="$(mktemp -d "${TMPDIR:-/tmp}/pw-deploy.XXXXXX")"
 trap 'rm -rf "$staging"' EXIT
 
