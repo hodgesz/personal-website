@@ -978,6 +978,25 @@ h1, h2, h3 {
   .js .reveal { opacity: 1; transform: none; }
 }
 
+/* Print is the same bug on another medium: `is-visible` is added by an IntersectionObserver,
+   which only ever fires for blocks the reader happened to scroll past. Someone who loads the
+   page and hits Cmd-P prints 894 characters over 8 pages instead of 6,562 — seven near-blank
+   sheets. Nothing about print should depend on scroll position, so unhide unconditionally.
+   `!important` because the reduced-motion block above is equally specific and later rules do
+   not lose to earlier ones only by being in a media query.
+
+   `transition: none` is load-bearing, not tidiness: without it the opacity animates 0 → 1
+   over 0.6s when the print stylesheet applies, and a rasterizer that snapshots before it
+   settles prints the page part-faded. Measured mid-transition: 28 blocks below 0.99 at t=0,
+   still 28 at t=300ms. Print has nothing to animate for, so make it instant. */
+@media print {
+  .js .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
 @media (max-width: 1000px) {
   .nav-shell {
     grid-template-columns: auto auto 1fr;
