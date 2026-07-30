@@ -69,14 +69,46 @@ origin/*)
 	;;
 esac
 
-staging="$(mktemp -d "${TMPDIR:-/tmp}/pw-deploy.XXXXXX")"
-trap 'rm -rf "$staging"' EXIT
+# The trap names its own variable rather than $staging, which is reassigned below to the upload subdir.
+# A trap that removes a moving target cleans up whatever the variable happens to hold at exit -- here that
+# would have been the subdirectory, leaving the parent behind and re-introducing the leak this fixes.
+staging_root="$(mktemp -d "${TMPDIR:-/tmp}/pw-deploy.XXXXXX")"
+trap 'rm -rf "$staging_root"' EXIT
+staging="$staging_root"
 
-git archive "$ref" | tar -x -C "$staging"
+export_dir="$staging/export"
+mkdir -p "$export_dir"
+git archive "$ref" | tar -x -C "$export_dir"
 
-# Repo docs and reference material: not referenced by index.html, and public for no benefit.
-rm -f "$staging"/AGENTS.md "$staging"/HANDOFF.md "$staging"/README.md "$staging"/.gitignore
-rm -rf "$staging"/content "$staging"/archive
+# AN ALLOWLIST, NOT A DENYLIST. This was `rm -f AGENTS.md HANDOFF.md README.md ...`, which publishes every
+# file nobody remembered to name -- and the first such file was this script: `deploy.sh` was served at
+# https://<site>/deploy.sh as application/x-sh on the preview that tested the denylist. A list of what to
+# remove has to be updated by whoever adds a file, at the moment they are thinking about something else,
+# and it fails by publishing. A list of what to ship fails by 404 instead, which is visible and safe.
+upload="$staging/upload"
+mkdir -p "$upload"
+SHIP=(index.html styles.css assets)
+for item in "${SHIP[@]}"; do
+	if [ -e "$export_dir/$item" ]; then
+		cp -R "$export_dir/$item" "$upload/$item"
+	fi
+done
+
+# index.html is the site; anything else being absent is a judgement call, but this is not.
+if [ ! -s "$upload/index.html" ]; then
+	echo "deploy: $ref has no index.html -- refusing to publish an empty site." >&2
+	exit 1
+fi
+
+# Name what was left behind. Silence here would make an accidentally-omitted new asset indistinguishable
+# from a deliberate exclusion, which is how an allowlist goes wrong.
+skipped="$(cd "$export_dir" && find . -maxdepth 1 -mindepth 1 -exec basename {} \; | sort | tr '\n' ' ')"
+for item in "${SHIP[@]}"; do
+	skipped="${skipped//$item /}"
+done
+[ -n "${skipped// /}" ] && echo "deploy: not publishing: ${skipped% }"
+
+staging="$upload"
 
 # The resume PDF is a real public download -- index.html links it three times -- so a deploy that drops
 # it serves a page whose CV button 404s. It is tracked as of this commit, so `git archive` carries it and
@@ -92,8 +124,9 @@ if grep -q "$pdf" "$staging/index.html" && [ ! -s "$staging/$pdf" ]; then
 	exit 1
 fi
 
-# Belt and braces: the claim matrix defines the NDA and customer-naming boundaries, so assert it is
-# not in the upload set rather than trusting the `rm -rf content` above to have covered every path.
+# Belt and braces: the claim matrix defines the NDA and customer-naming boundaries, so assert it is not in
+# the upload set rather than trusting the allowlist to have been built correctly. Cheap, and it checks the
+# directory that is actually about to be uploaded rather than the intent behind it.
 if find "$staging" -name "claim-matrix*" -print -quit | grep -q .; then
 	echo "deploy: claim-matrix is in the upload set -- aborting." >&2
 	exit 1

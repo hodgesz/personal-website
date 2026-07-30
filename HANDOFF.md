@@ -19,12 +19,18 @@ is off by decision (2026-07-30), so every publish is manual. **Use `./deploy.sh`
 
 Do NOT run `wrangler pages deploy .` by hand. It uploads the **working directory**, which publishes
 uncommitted work-in-progress and every untracked file sitting in the tree. `deploy.sh` exports a
-committed ref with `git archive` instead, and strips what must not ship.
+committed ref with `git archive` instead and uploads only what the site needs.
 
 **`.gitignore` does not apply to a deploy, and `.assetsignore` does nothing on Pages** — that is a
 Workers Assets feature. Verified: a preview deploy with an `.assetsignore` still served `HANDOFF.md`
 as `text/markdown`. The only mechanism Pages honours is what is in the upload directory, which is why
-the exclusions live in `deploy.sh` rather than in a config file.
+this lives in `deploy.sh` rather than in a config file.
+
+**The upload set is an allowlist — `SHIP=(index.html styles.css assets)` in `deploy.sh`.** Adding a
+top-level file or directory the site needs means adding it there, and the script prints everything it
+left behind on every run so an omission is visible. It started as a denylist of files to remove, and the
+first file nobody thought to name was `deploy.sh` itself, served at `/deploy.sh` as `application/x-sh`.
+A denylist fails by publishing; an allowlist fails by 404.
 
 This file, `AGENTS.md`, `README.md` and `content/` were world-readable at
 `https://jonathanhodges.ai/<file>` until 2026-07-30 for exactly that reason.
