@@ -74,10 +74,14 @@ cd "$staging"
 
 # NOT `exec`: that replaces this shell, so the EXIT trap never runs and every deploy leaves a full copy
 # of the staged site behind in $TMPDIR -- resume PDF included, in a directory other local users can read.
-# Five had already accumulated from testing this script. Run wrangler as a child, let the trap fire, and
-# pass its exit status through so a failed upload is still a failed deploy.
+# Five had already accumulated from testing this script. Running wrangler as a child lets the trap fire.
+#
+# `|| status=$?` rather than a bare call followed by `status=$?`: under `set -e` a failing wrangler aborts
+# the script at the call, so the assignment after it is only ever reached with 0 -- dead code that reads
+# like error handling. The trap still runs on that abort, so cleanup was never the problem; the exit
+# status was, and `||` is what actually keeps it.
+status=0
 npx wrangler pages deploy . \
-	--project-name=personal-website --branch="$branch" --commit-dirty=true
-status=$?
+	--project-name=personal-website --branch="$branch" --commit-dirty=true || status=$?
 cd "$root"
 exit "$status"
