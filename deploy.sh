@@ -71,5 +71,13 @@ fi
 
 echo "deploy: $(find "$staging" -type f | wc -l | tr -d ' ') files from $ref -> branch '$branch'"
 cd "$staging"
-exec npx wrangler pages deploy . \
+
+# NOT `exec`: that replaces this shell, so the EXIT trap never runs and every deploy leaves a full copy
+# of the staged site behind in $TMPDIR -- resume PDF included, in a directory other local users can read.
+# Five had already accumulated from testing this script. Run wrangler as a child, let the trap fire, and
+# pass its exit status through so a failed upload is still a failed deploy.
+npx wrangler pages deploy . \
 	--project-name=personal-website --branch="$branch" --commit-dirty=true
+status=$?
+cd "$root"
+exit "$status"
