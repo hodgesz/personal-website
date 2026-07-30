@@ -1,0 +1,75 @@
+#!/bin/bash
+#
+# Deploy the site to Cloudflare Pages from a clean export of a committed ref.
+#
+# Two problems this exists to solve, both of which have already happened:
+#
+# 1. `wrangler pages deploy .` uploads the WORKING DIRECTORY. With uncommitted work in the tree that
+#    publishes work-in-progress; with untracked files it publishes those too. `.gitignore` does not
+#    apply to a deploy, and `.assetsignore` is a Workers Assets feature that Pages ignores -- verified
+#    on a preview deploy, where HANDOFF.md was still served as text/markdown with the file present.
+#    The only mechanism Pages honours is what is in the directory, so this exports with `git archive`
+#    and deletes what must not ship.
+#
+# 2. Repo docs were public. HANDOFF.md (which carries the Cloudflare account and zone ids), AGENTS.md,
+#    README.md and content/*.md were all live at https://jonathanhodges.ai/<file> from earlier
+#    deploys. Nothing in index.html references them.
+#
+# Usage: ./deploy.sh [ref] [--production]
+#   ref defaults to origin/main. Without --production it deploys to a preview branch, which is the
+#   safe default: production is the recruiter-facing site.
+
+set -euo pipefail
+
+ref="${1:-origin/main}"
+case "${2:-}" in
+--production) branch="main" ;;
+"") branch="preview-$(git rev-parse --short "$ref")" ;;
+*)
+	echo "usage: $0 [ref] [--production]" >&2
+	exit 2
+	;;
+esac
+
+root="$(git rev-parse --show-toplevel)"
+cd "$root"
+
+if ! git rev-parse --verify --quiet "$ref" >/dev/null; then
+	echo "deploy: '$ref' is not a ref this clone knows -- fetch first?" >&2
+	exit 1
+fi
+
+staging="$(mktemp -d "${TMPDIR:-/tmp}/pw-deploy.XXXXXX")"
+trap 'rm -rf "$staging"' EXIT
+
+git archive "$ref" | tar -x -C "$staging"
+
+# Repo docs and reference material: not referenced by index.html, and public for no benefit.
+rm -f "$staging"/AGENTS.md "$staging"/HANDOFF.md "$staging"/README.md "$staging"/.gitignore
+rm -rf "$staging"/content "$staging"/archive
+
+# The resume PDF is a real public download -- index.html links it three times -- so a deploy that drops
+# it serves a page whose CV button 404s. It is tracked as of this commit, so `git archive` carries it and
+# the check is that the archive really did: assert, do not repair.
+#
+# An earlier version copied it from the working tree, left over from when the file was untracked. That
+# would publish an uncommitted draft resume while reporting a deploy of `origin/main` -- the exact thing
+# exporting a committed ref exists to prevent. Whatever is wrong here, the fix is a commit, not a copy.
+pdf="assets/Jonathan_Hodges_VP_Data_AI_Resume_3Page.pdf"
+if grep -q "$pdf" "$staging/index.html" && [ ! -s "$staging/$pdf" ]; then
+	echo "deploy: index.html links $pdf but $ref does not contain it." >&2
+	echo "deploy: refusing to publish a page with a dead CV link. Commit the PDF first." >&2
+	exit 1
+fi
+
+# Belt and braces: the claim matrix defines the NDA and customer-naming boundaries, so assert it is
+# not in the upload set rather than trusting the `rm -rf content` above to have covered every path.
+if find "$staging" -name "claim-matrix*" -print -quit | grep -q .; then
+	echo "deploy: claim-matrix is in the upload set -- aborting." >&2
+	exit 1
+fi
+
+echo "deploy: $(find "$staging" -type f | wc -l | tr -d ' ') files from $ref -> branch '$branch'"
+cd "$staging"
+exec npx wrangler pages deploy . \
+	--project-name=personal-website --branch="$branch" --commit-dirty=true

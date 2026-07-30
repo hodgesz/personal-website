@@ -2,3 +2,16 @@
 *.log
 node_modules/
 .wrangler/
+
+# Unpublished working documents. These were merely untracked, which is not the same as ignored:
+# `wrangler pages deploy .` uploads the whole directory, and `codex exec review` is agentic and reads
+# whatever is in the tree, so an untracked file next to either one is one command away from being
+# public. `content/claim-matrix.md` is the file that decides which customers may be named and where
+# the NDA boundaries sit, so it is the one that must never be quoted into a review comment on a public
+# PR. Ignoring them also keeps them out of a deploy: see the `.assetsignore` note in HANDOFF.md.
+#
+# The resume PDF is deliberately NOT ignored. It is a public download the in-progress redesign links,
+# so it belongs in the repo rather than living untracked as a 143K binary no clone has. (No *committed*
+# index.html references it yet -- the published page's resume button goes to Google Drive.)
+content/claim-matrix.md
+content/homepage-narrative.md
