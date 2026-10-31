@@ -79,3 +79,26 @@ origin actually holds.
 python3 -m http.server 8000
 # then open http://localhost:8000/  (or headless-Chrome screenshot to check)
 ```
+
+
+## October 31, 2026: review setup and narrowly authorized Planner information pages
+
+Owner authorizes adding Family Planner public information/privacy pages under this
+existing site and Actions/Gemini Argon-low review patterned after JobFinder and
+Family Planner. Existing homepage claims and private Planner ingress remain outside
+this change. The private claim matrix is absent from this clone; no resume claim
+is changed or independently cleared.
+
+Source adds credential-free foundation checks, a trusted-base Gemini receipt
+verifier and the reviewed JobFinder transport/offline cases with website identity.
+There is no existing workflow/protection at inspection. Follow docs/PR_REVIEW.md
+for first installation followed by genuine exact-base verification before strict
+required-check activation. No synthetic status, privileged candidate bootstrap
+workflow, CodeRabbit or Codex reviewer is introduced.
+
+Initial source tests find the missing workflow, then missing review-instruction
+front matter; both are addressed before final verification. Final local verification passes: one-page structure/local links, four synthetic
+deployment-boundary cases, shell syntax, and all 204 offline protocol cases. Hosted
+CI/Gemini, protection activation and Cloudflare publication must be recorded from
+actual results. The new public pages are a subsequent content PR. Linux has no
+proven Cloudflare deployment authentication; this is not a deployed-site claim.

@@ -1,7 +1,8 @@
 # Notes for agents working in this repo
 
-Read this before changing anything. It exists because `codex exec review` cannot be re-prompted
-(`--base` refuses a prompt argument), so this file is the only steering a reviewer gets.
+Read this before changing anything. Codex implements and tests; independent review uses native
+Google-account Gemini `gemini-4-argon-low` with explicit low effort. Codex and CodeRabbit are not
+reviewers. See [the review procedure](docs/PR_REVIEW.md).
 
 This is a **public** repo serving `jonathanhodges.ai`. A wrong claim or a broken layout here is
 visible to recruiters and hiring managers, which is the whole audience.
@@ -15,10 +16,11 @@ HTML.
 ## Running things
 
 - Preview: `python3 -m http.server 8000`, then open `http://localhost:8000`.
-- Build: **there is none.** Test: none. Lint: none. No formatter config, so match surrounding style
-  by hand.
-- Deploy: `npx wrangler pages deploy . --project-name=personal-website --branch=main
-  --commit-dirty=true`, with `CLOUDFLARE_API_TOKEN` exported or after `npx wrangler login`.
+- Build: **there is none.** Checks: `python3 scripts/check-site.py`,
+  `python3 -m unittest discover -s tests -p 'test_*.py'`, `bash -n deploy.sh`, and
+  `node --test tests/review/*.test.mjs` (Node 22.22.2). No formatter config; match surrounding style.
+- Deploy: use `./deploy.sh origin/main` for preview or `./deploy.sh origin/main --production`
+  after review and current deployment checks. Never upload the working directory directly.
 
 ## Things that look like bugs and are not
 
@@ -69,6 +71,15 @@ documentation asserted a fallback that was never implemented, so anyone checking
 the case was handled. Treat a claim in `HANDOFF.md` as something to verify, and **report the
 mismatch** rather than assuming the doc is the newer of the two.
 
-**Deployment is gated.** README and HANDOFF both carry a pause on public deploys pending approval of
-brand positioning and the claim matrix. Do not suggest shipping, and do not treat a merged PR as
-shipped.
+**Deployment is separate from merge.** On October 31 the owner authorizes adding public Family
+Planner information/privacy pages to this existing website and establishing Actions/Gemini review.
+This narrow addition must preserve the existing homepage, resume facts and live site assets. It does
+not authorize an unrelated brand-positioning redesign or exposure of the private Planner service.
+Verify source versus actual deployed content before any full-site upload; preserve work absent from
+this clone. Missing Cloudflare authority is an access boundary, not successful deployment.
+
+Use non-draft PRs. Require genuine final-head foundation and complete Gemini receipt/coverage with
+no unresolved findings; do not restore a Codex hook or fabricate a status. After initial reviewer
+installation, normal verification executes trusted base code only. Required-check activation must
+follow an actual successful current-head verifier run. Preserve history and existing protections.
+Do not commit credentials, private household data or operator evidence.
