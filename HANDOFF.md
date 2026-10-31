@@ -102,3 +102,29 @@ deployment-boundary cases, shell syntax, and all 204 offline protocol cases. Hos
 CI/Gemini, protection activation and Cloudflare publication must be recorded from
 actual results. The new public pages are a subsequent content PR. Linux has no
 proven Cloudflare deployment authentication; this is not a deployed-site claim.
+
+
+## October 31, 2026: initial review infrastructure merged; OAuth information added
+
+PR #4 merged normally at `cbca508efae37a792f6a3bc272c22cd82ab71687`, preserving
+reviewed head `d6115deece594ab0b6d7de7561831488411e0dad`. Final-head foundation
+41234236159 passes. Native Argon low review 5724680708 covers all 23 immutable
+diff records across two complete batches with no findings. Its generation
+completed once; the CLI publication step lacked a token environment, so the
+validated original receipt/body was posted with the connected GitHub tool. The
+posted owner/head/body were read back and compared. No generation was repeated.
+All comments/conversations were inspected; initial verifier skip is not gate
+evidence. No protection existed or was bypassed, and no Cloudflare deploy occurs.
+
+This content slice adds `family-planner/` with an app homepage, factual privacy and
+access/use information plus a local stylesheet. No real household schedule, account,
+private Planner origin, credential, signup or application access is exposed. The
+existing professional homepage and assets are unchanged. `deploy.sh` adds only this
+public directory to its committed-ref upload allowlist. New tests catch forgotten
+public-directory packaging, missing links and links to existing unshipped docs.
+
+Use a genuine exact-base review and successful hosted verifier for this separate
+content PR before activating strict foundation/gemini-review protection and merging.
+Cloudflare still needs actual authenticated deployment access and confirmation that
+the committed existing homepage/assets match the current deployment; the Linux
+HTTP readback received 403 and must not be described as content equality.

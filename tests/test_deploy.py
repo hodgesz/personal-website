@@ -24,7 +24,7 @@ class DeploymentBoundary(unittest.TestCase):
         self.git('config', 'user.name', 'Synthetic Test')
         self.git('config', 'user.email', 'test@example.com')
         shutil.copyfile(SCRIPT, self.repo / 'deploy.sh')
-        for name, text in {'index.html':'<h1>Synthetic</h1>', 'styles.css':'body{}', 'assets/public.txt':'public fixture', 'HANDOFF.md':'not for upload', '.github/workflows/ci.yml':'private deployment boundary fixture', 'content/claim-matrix.md':'do not upload'}.items():
+        for name, text in {'index.html':'<h1>Synthetic</h1>', 'styles.css':'body{}', 'assets/public.txt':'public fixture', 'family-planner/index.html':'public app info', 'family-planner/privacy.html':'public privacy', 'family-planner/info.css':'public style', 'HANDOFF.md':'not for upload', '.github/workflows/ci.yml':'private deployment boundary fixture', 'content/claim-matrix.md':'do not upload'}.items():
             p = self.repo / name
             p.parent.mkdir(parents=True, exist_ok=True)
             p.write_text(text)
@@ -45,7 +45,7 @@ class DeploymentBoundary(unittest.TestCase):
         (self.repo / 'assets/untracked.txt').write_text('UNTRACKED')
         result = self.deploy()
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertEqual(self.manifest.read_text().splitlines(), ['./assets/public.txt', './index.html', './styles.css'])
+        self.assertEqual(self.manifest.read_text().splitlines(), ['./assets/public.txt', './family-planner/index.html', './family-planner/info.css', './family-planner/privacy.html', './index.html', './styles.css'])
 
     def test_missing_linked_resume_is_refused(self):
         (self.repo / 'index.html').write_text('assets/Jonathan_Hodges_VP_Data_AI_Resume_3Page.pdf')
