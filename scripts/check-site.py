@@ -41,6 +41,8 @@ def check(root=ROOT):
             if target.is_dir():
                 target = target / 'index.html'
             assert target.is_file(), f'Missing local link: {p.name}: {href}'
+            relative = target.relative_to(root.resolve())
+            assert relative.parts[0] in ('index.html', 'styles.css', 'assets', 'family-planner'), f'Link is outside the public upload set: {href}'
             if url.fragment and target in pages:
                 assert unquote(url.fragment) in pages[target].ids, f'Missing anchor: {href}'
     print(f'Checked {len(pages)} public HTML page(s) and local links.')

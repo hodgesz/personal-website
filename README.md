@@ -9,6 +9,7 @@ Personal website for Jonathan Hodges — a static, single-page applied-AI execut
 ├── index.html            # the site
 ├── styles.css            # all styling
 ├── assets/images/        # all images (portrait, logos, screenshots, etc.)
+├── family-planner/       # public OAuth app information/privacy; no household app access
 ├── content/
 │   └── site-content.md   # structured source content (edit here, then update index.html)
 └── archive/

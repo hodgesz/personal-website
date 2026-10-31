@@ -87,7 +87,7 @@ git archive "$ref" | tar -x -C "$export_dir"
 # and it fails by publishing. A list of what to ship fails by 404 instead, which is visible and safe.
 upload="$staging/upload"
 mkdir -p "$upload"
-SHIP=(index.html styles.css assets)
+SHIP=(index.html styles.css assets family-planner)
 for item in "${SHIP[@]}"; do
 	if [ -e "$export_dir/$item" ]; then
 		cp -R "$export_dir/$item" "$upload/$item"
