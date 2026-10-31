@@ -15,3 +15,7 @@ node_modules/
 # index.html references it yet -- the published page's resume button goes to Google Drive.)
 content/claim-matrix.md
 content/homepage-narrative.md
+
+# Local Python check bytecode.
+__pycache__/
+*.py[cod]

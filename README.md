@@ -31,3 +31,11 @@ A Git push does not deploy this project. See `HANDOFF.md` for the current Wrangl
 
 Text and links live directly in `index.html`. `content/site-content.md` mirrors the copy
 for reference. Images go in `assets/images/`.
+
+## Checks and independent review
+
+GitHub Actions runs static-link, deployment-boundary and offline review-protocol
+checks. Independent review uses native Google-account Gemini Argon low; see
+[the review and first-use procedure](docs/PR_REVIEW.md). Actions verifies a current
+owner-posted receipt and never runs the model. Review setup is separate from
+Cloudflare publication; a Git push or merge does not deploy this Direct Upload site.
