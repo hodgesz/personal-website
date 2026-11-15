@@ -128,3 +128,10 @@ content PR before activating strict foundation/gemini-review protection and merg
 Cloudflare still needs actual authenticated deployment access and confirmation that
 the committed existing homepage/assets match the current deployment; the Linux
 HTTP readback received 403 and must not be described as content equality.
+
+
+## November 14, 2026: Planner SMS registration information prepared
+
+The owner selects a US toll-free sender for opted-in app-user reminders, starting with Planner. Add narrowly scoped SMS information, Privacy Policy and Terms of Service pages under the existing public app-information directory. Identify the operator from the approved business profile and reuse the existing public domain contact, with no notification-email routing change. Preserve the professional homepage, all resume claims/assets and private application boundary. The pages explain the actual optional adult self-enrollment, generic verification/reminder content, rates/frequency, HELP/STOP and retained delivery/suppression records. They accurately say SMS is pending provider verification. No phone collection form or private service origin is exposed here.
+
+Local source verification passes: seven public pages/local links, all seven Python deployment/link tests, shell syntax and204 offline review protocol cases. Actual current-head Gemini/hosted checks and production publication are not yet established. Wrangler4.162.0 whoami confirms that this Linux host is not authenticated to Cloudflare; the earlier OAuth setup on another host is not transferred or claimed. Review and use the normal committed-ref export for any later authorized publication. No number rental, provider verification submission or live SMS occurred in this content preparation.
