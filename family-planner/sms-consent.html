@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Planner SMS consent screen capture</title>
+<link rel="stylesheet" href="info.css">
+<style>
+.capture { border:1px solid #c3d5df; background:#fff; padding:20px; margin-top:24px }
+.capture fieldset { min-width:0; margin:0; padding:16px }
+.capture label { display:block; margin:16px 0; font-weight:650 }
+.capture input[type="tel"] { display:block; width:100%; min-height:44px; margin-top:8px }
+.capture input[type="checkbox"] { width:22px; height:22px; vertical-align:middle; margin-right:8px }
+.capture button { padding:12px; font:inherit; max-width:100% }
+.capture p { overflow-wrap:anywhere }
+</style>
+</head>
+<body>
+<main>
+<nav aria-label="App information"><a href="sms.html">Planner SMS</a><a href="sms-privacy.html">SMS Privacy Policy</a><a href="sms-terms.html">SMS Terms of Service</a></nav>
+<p class="eyebrow">Actual app consent · read-only HTML capture</p>
+<h1>SMS consent screen</h1>
+<p>This is the phone-consent panel captured from the actual Planner production build on November 14, 2026, using an isolated synthetic adult account with no phone destination. The text, checkbox state, policy destinations and disabled controls below are preserved from the rendered app. Styling is adapted for this public information page.</p>
+<p>The live form requires an authorized adult to sign in to Planner. This public capture cannot collect a number or send a text. Sending is disabled pending provider verification. See the <a href="sms.html">complete enrollment steps</a>.</p>
+<section class="capture" aria-label="Captured app consent panel">
+<fieldset><legend>Your phone destination</legend><p>No verified phone</p><form><label>Phone in international format<input autocomplete="tel" disabled="" type="tel" value="" style=""></label><label><input disabled="" type="checkbox" style="">I own this phone and choose to receive Planner SMS from Dakota Ridge Consulting LLC: a verification code and reminders for events I select. Message frequency varies. Message and data rates may apply. Reply HELP for help or STOP to stop. SMS is optional; consent is not a condition of purchase.</label><p>Read the <a href="https://jonathanhodges.ai/family-planner/sms-terms.html">Terms of Service</a> and <a href="https://jonathanhodges.ai/family-planner/sms-privacy.html">Privacy Policy</a> before choosing SMS.</p><button disabled="">Send verification code</button></form></fieldset>
+</section>
+<footer>Family Planner · application information</footer>
+</main>
+</body>
+</html>
