@@ -434,7 +434,7 @@ export function validateReviewOutput(output, bundle) {
 
 // Review-only model policy. Successful native metadata is an owner attestation,
 // not cryptographic model identity or a weekly-budget/quota measurement.
-export const PRIMARY_MODEL = "gemini-4-argon-low";
+export const PRIMARY_MODEL = "gemini-4-neon-low";
 export const FALLBACK_MODEL = "gemini-3.8-flash-high";
 export function modelEffort(model) {
   check(

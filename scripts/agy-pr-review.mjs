@@ -6,7 +6,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { isDeepStrictEqual } from "node:util";
 
-export const MODEL = "gemini-4-argon-low";
+export const MODEL = "gemini-4-neon-low";
 export const EFFORT = "low";
 export const PROMPT_LIMIT = 163840;
 export const PROMPT_RESERVE = 8192;
@@ -39,7 +39,7 @@ const json = (value) => `${JSON.stringify(value, null, 2)}\n`;
 const has = (object, key) => Object.hasOwn(object, key);
 // The entry digest in each receipt transitively binds this literal module pin.
 export const COMPLETION_SHA256 =
-  "c515d9ea17a34866a61a6191f0dff79fe70de72d1a2f962982040adeeeaec196";
+  "92ca38edd05e65f6b86058ad8700d39c2accbc93415f5ab6d332681b8b1db05c";
 const completionPath = new URL(
   "./agy-pr-review-completion.mjs",
   import.meta.url,
@@ -678,7 +678,7 @@ export function validateEvents(
 ) {
   validateBundle(bundle);
   modelEffort(model);
-  check(model === MODEL, "JobFinder requires Gemini Argon low; model fallback is disabled");
+  check(model === MODEL, "Personal Website requires Gemini Neon low; model fallback is disabled");
   if (selection) validateSelection(selection, model);
   check(
     SLUG.test(model) && ["review", "local_only"].includes(mode),
@@ -966,7 +966,7 @@ export function aggregateReviews(
 function validateAttestedAggregate(bundle, receipt, model) {
   validateSelection(receipt.selection, model);
   model = receipt.selection.model;
-  check(model === MODEL && receipt.selection.effort === "low", "JobFinder requires Gemini Argon low");
+  check(model === MODEL && receipt.selection.effort === "low", "Personal Website requires Gemini Neon low");
   const { plan, requests } = preflightBatches(bundle);
   check(
     receipt.batch_schema === BATCH_SCHEMA &&
@@ -1291,7 +1291,7 @@ export async function reviewSession(bundle, options, execute = bounded) {
     selection = selectReviewModel(policy, modelsStdout, modelsStderr);
     const model = selection.model,
       effort = selection.effort;
-    check(model === MODEL && effort === "low", "JobFinder requires Gemini Argon low; model fallback is disabled");
+    check(model === MODEL && effort === "low", "Personal Website requires Gemini Neon low; model fallback is disabled");
     for (const request of preflight.requests) {
       check(Date.now() < deadline, "Review total time limit exceeded");
       const result = await execute(

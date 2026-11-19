@@ -23,7 +23,7 @@ and deployment addresses must never be published. Preserve existing homepage
 claims; an absent private claim matrix cannot establish new resume facts.
 
 For review infrastructure, check exact base/head binding, complete diff coverage,
-native Argon-low identity/usage, denied tools, credential isolation, trusted-base
+native Neon-low identity/usage, denied tools, credential isolation, trusted-base
 execution and rejection of stale, partial, forged or finding-bearing receipts.
 The model never runs candidate tests. Deterministic CI is a separate gate.
 
