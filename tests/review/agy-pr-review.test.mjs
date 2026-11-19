@@ -233,14 +233,14 @@ async function temporary(t) {
   return directory;
 }
 
-test("CLI help is offline and parser keeps the requested model and Argon LOW default", async () => {
+test("CLI help is offline and parser keeps the requested model and Neon LOW default", async () => {
   const result = await bounded(
     process.execPath,
     [path.join(root, "scripts/agy-pr-review.mjs"), "--help"],
     { env: cleanEnv() },
   );
   assert.match(result.stdout, /Dry-run never invokes a model/);
-  assert.equal(parseArgs([]).model, "gemini-4-argon-low");
+  assert.equal(parseArgs([]).model, "gemini-4-neon-low");
   assert.equal(
     parseArgs(["--model", FALLBACK_MODEL, "42"]).model,
     FALLBACK_MODEL,
@@ -708,10 +708,11 @@ test("bootstrap accepts only an explicit full immutable SHA, never a branch or e
   );
 });
 
-const nativeRaw = await fs.readFile(
+const recordedArgon = await fs.readFile(
   path.join(root, "tests/review/fixtures/agy-pr-review-native-1.4.2.ndjson"),
   "utf8",
 );
+const nativeRaw = recordedArgon.replace("gemini-4-argon-low", MODEL);
 const nativeBundle = {
   ...bundle,
   files: Array.from({ length: 8 }, (_, i) => ({
@@ -751,7 +752,7 @@ function native(mutator) {
   return rows.map((row) => JSON.stringify(row)).join("\n") + "\n";
 }
 
-test("native 1.4.2 two-turn completion retains exact eight-file coverage and usage without granting tool access", () => {
+test("simulated Neon 1.4.2 two-turn completion retains exact eight-file coverage and usage without granting tool access", () => {
   const receipt = validateEvents(nativeRaw, nativeBundle, MODEL);
   assert.equal(receipt.num_turns, 2);
   assert.deepEqual(
@@ -771,6 +772,10 @@ test("native 1.4.2 two-turn completion retains exact eight-file coverage and usa
     ).id,
     71,
   );
+});
+
+test("rejects an Argon LOW stream under the Neon review policy", () => {
+  assert.throws(() => validateEvents(recordedArgon, nativeBundle, MODEL), /model/i);
 });
 
 test("native initial response may be one exact JSON document with the identical canonical completion", () => {
@@ -1140,7 +1145,7 @@ test("completed output binds full coverage, exact model and raw evidence digest"
     MODEL,
     "review",
     undefined,
-    selectReviewModel("auto", `${MODEL} Synthetic Argon\n`, ""),
+    selectReviewModel("auto", `${MODEL} Synthetic Neon\n`, ""),
   );
   assert.equal(receipt.head, head);
   assert.equal(receipt.evidence_sha256, sha256(raw));
@@ -1149,7 +1154,7 @@ test("completed output binds full coverage, exact model and raw evidence digest"
   assert.equal(receipt.provider, "google-account");
   assert.match(
     reviewBody(receipt),
-    /Model: `gemini-4-argon-low` · Effort: low/,
+    /Model: `gemini-4-neon-low` · Effort: low/,
   );
 });
 
@@ -1277,7 +1282,7 @@ localTest(
         if (args.at(-1) === "--version")
           return { stdout: `agy ${VERSION}\n`, stderr: "" };
         if (args.at(-1) === "models")
-          return { stdout: `${MODEL}\tGemini 4 Argon (Low)\n`, stderr: "" };
+          return { stdout: `${MODEL}\tGemini 4 Neon (Low)\n`, stderr: "" };
         assert.equal(args[args.indexOf("--effort") + 1], "low");
         assert.equal(args[args.indexOf("--model") + 1], MODEL);
         assert.match(
@@ -1343,14 +1348,14 @@ localTest(
         if (args.at(-1) === "--version") return { stdout: VERSION, stderr: "" };
         if (args.at(-1) === "models") {
           assert.equal(options.retainStderr, true);
-          return { stdout: `${MODEL}\tGemini 4 Argon (Low)\n`, stderr };
+          return { stdout: `${MODEL}\tGemini 4 Neon (Low)\n`, stderr };
         }
         return { stdout: batchEvents(args), stderr: "" };
       },
     );
     assert.equal(calls, 3);
     assert.equal(result.modelsStderr, stderr);
-    assert.equal(result.receipt.model, "gemini-4-argon-low");
+    assert.equal(result.receipt.model, "gemini-4-neon-low");
     assert.equal(result.receipt.effort, "low");
     assert.ok(!reviewBody(result.receipt).includes(stderr));
   },
@@ -1380,7 +1385,7 @@ for (const stderr of [
             if (args.at(-1) === "--version")
               return { stdout: VERSION, stderr: "" };
             assert.equal(args.at(-1), "models");
-            return { stdout: `${MODEL}\tGemini 4 Argon (Low)\n`, stderr };
+            return { stdout: `${MODEL}\tGemini 4 Neon (Low)\n`, stderr };
           },
         ),
         (error) => {
@@ -1395,7 +1400,7 @@ for (const stderr of [
 }
 
 localTest(
-  "missing Argon fails after metadata without a generation or retry, even with harmless status",
+  "missing Neon fails after metadata without a generation or retry, even with harmless status",
   async (t) => {
     const directory = await temporary(t);
     const binary = path.join(directory, "fictional-agy");
@@ -1443,7 +1448,7 @@ localTest(
             [
               "-e",
               'process.stdout.write(process.argv[1]); process.stderr.write("Authentication required\\n"); process.exitCode = 1;',
-              `${MODEL}\tGemini 4 Argon (Low)\n`,
+              `${MODEL}\tGemini 4 Neon (Low)\n`,
             ],
             { env: cleanEnv(), retainStderr: options.retainStderr },
           );
@@ -1475,7 +1480,7 @@ localTest(
           if (args.at(-1) === "--version")
             return { stdout: VERSION, stderr: "" };
           if (args.at(-1) === "models")
-            return { stdout: `${MODEL}\tGemini 4 Argon (Low)\n`, stderr: "" };
+            return { stdout: `${MODEL}\tGemini 4 Neon (Low)\n`, stderr: "" };
           return { stdout: events(), stderr: "Fetching available models...\n" };
         },
       ),
@@ -1485,7 +1490,7 @@ localTest(
   },
 );
 
-localTest("JobFinder refuses a non-Argon selection before generation", async (t) => {
+localTest("JobFinder refuses a non-Neon selection before generation", async (t) => {
   const directory = await temporary(t);
   const binary = path.join(directory, "fictional-agy");
   await fs.writeFile(binary, "transport stub only");
@@ -1497,7 +1502,7 @@ localTest("JobFinder refuses a non-Argon selection before generation", async (t)
       if(args.at(-1)==="models")return {stdout:`${FALLBACK_MODEL} Future`,stderr:""};
       generation++;
       throw new Error("wrong-model generation must never run");
-    }), /JobFinder requires Gemini Argon low/);
+    }), /Personal Website requires Gemini Neon low/);
   assert.equal(generation,0);
 });
 
@@ -1519,7 +1524,7 @@ for (const markers of [
       calls++;
       if (args.at(-1) === "--version") return { stdout: VERSION, stderr: "" };
       if (args.at(-1) === "models")
-        return { stdout: `${MODEL}\tGemini 4 Argon (Low)`, stderr: "" };
+        return { stdout: `${MODEL}\tGemini 4 Neon (Low)`, stderr: "" };
       return { stdout: batchEvents(args), stderr: "" };
     };
     try {
@@ -1880,7 +1885,7 @@ localTest(
       async (_command, args, options) => {
         if (args.at(-1) === "--version") return { stdout: VERSION, stderr: "" };
         if (args.at(-1) === "models")
-          return { stdout: `${MODEL}\tGemini 4 Argon (Low)`, stderr: "" };
+          return { stdout: `${MODEL}\tGemini 4 Neon (Low)`, stderr: "" };
         assert.ok(Buffer.byteLength(options.input) > 90000);
         assert.ok(Buffer.byteLength(JSON.stringify(args)) < 10000);
         return { stdout: batchEvents(args), stderr: "" };

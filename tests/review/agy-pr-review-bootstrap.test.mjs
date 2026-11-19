@@ -1016,7 +1016,7 @@ test("owner-adopted verifier completes only with signed job proof, real tree abs
       MODEL,
       "review",
       undefined,
-      selectReviewModel("auto", `${MODEL} Synthetic Argon\n`, ""),
+      selectReviewModel("auto", `${MODEL} Synthetic Neon\n`, ""),
     );
     const flashEvents = raw.map(
       (text) =>
@@ -1030,7 +1030,7 @@ test("owner-adopted verifier completes only with signed job proof, real tree abs
           })
           .join("\n") + "\n",
     );
-    // Deliberately forged non-Argon receipt for rejection tests; never model evidence.
+    // Deliberately forged non-Neon receipt for rejection tests; never model evidence.
     flashReceipt = {...receipt, model:FALLBACK_MODEL, effort:"high",
       selection:selectReviewModel("flash-only",`${FALLBACK_MODEL} Synthetic Flash High\n`,"")};
     primaryReceipt = aggregateReviews(
@@ -1039,7 +1039,7 @@ test("owner-adopted verifier completes only with signed job proof, real tree abs
       MODEL,
       "review",
       undefined,
-      selectReviewModel("primary-only", `${MODEL} Synthetic Argon\n`, ""),
+      selectReviewModel("primary-only", `${MODEL} Synthetic Neon\n`, ""),
     );
     review = {
       id: 75,
@@ -1235,7 +1235,7 @@ test("owner-adopted verifier completes only with signed job proof, real tree abs
         dir,
       ]);
     // Same actual signed CI proof and permit validators must admit an approved
-    // primary-only Argon selection, never a relabeled or fallback receipt.
+    // primary-only Neon selection, never a relabeled or fallback receipt.
     for (const selectedReceipt of [primaryReceipt]) {
       const selectedReview = { ...review, body: reviewBody(selectedReceipt) };
       const selectedComment = {
@@ -1619,8 +1619,8 @@ test("owner-adopted verifier completes only with signed job proof, real tree abs
         dir,
       ]);
     for (const [policy, listing, model] of [
-      ["auto", `${MODEL} Synthetic Argon\n`, MODEL],
-      ["primary-only", `${MODEL} Synthetic Argon\n`, MODEL],
+      ["auto", `${MODEL} Synthetic Neon\n`, MODEL],
+      ["primary-only", `${MODEL} Synthetic Neon\n`, MODEL],
     ]) {
       const selection = selectReviewModel(policy, listing, "");
       const normalReceipt = aggregateReviews(

@@ -1,7 +1,7 @@
 # Notes for agents working in this repo
 
 Read this before changing anything. Codex implements and tests; independent review uses native
-Google-account Gemini `gemini-4-argon-low` with explicit low effort. Codex and CodeRabbit are not
+Google-account Gemini `gemini-4-neon-low` with explicit low effort. Codex and CodeRabbit are not
 reviewers. See [the review procedure](docs/PR_REVIEW.md).
 
 This is a **public** repo serving `jonathanhodges.ai`. A wrong claim or a broken layout here is

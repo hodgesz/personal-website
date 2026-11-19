@@ -1,5 +1,9 @@
 # Independent Gemini review
 
+The active reviewer is `gemini-4-neon-low` with explicit low effort. The Neon
+migration PR uses Argon LOW from trusted main. Reviews based on the adopted
+controls use Neon LOW after the migration merges.
+
 The owner selected native Google-account Antigravity `gemini-4-argon-low`, explicit
 low effort, on October 31, 2026. Codex implements/tests; Codex and CodeRabbit are
 not independent reviewers. No API credential, billing fallback or automatic model
@@ -15,7 +19,7 @@ Reuse existing native Google sign-in; never export credentials to Actions.
 
 ```sh
 scripts/agy-pr-review.sh --dry-run --out /private/fresh-input PR_NUMBER
-scripts/agy-pr-review.sh --model gemini-4-argon-low --effort low \
+scripts/agy-pr-review.sh --model gemini-4-neon-low --effort low \
   --agy /absolute/pinned/agy --out /private/fresh-result PR_NUMBER
 ```
 
